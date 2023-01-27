@@ -13,7 +13,7 @@ const Dish = require('../models/Dish');
 // handle admin sign up
 router.post('/signup', async (req, res) => {
 		try {
-			let { username, password } = req.body;
+			let { name, username, password } = req.body;
 			let admin = await Admin.findOne({ username });
 			if (admin) {
 				console.log('Admin already Exists');
@@ -22,7 +22,7 @@ router.post('/signup', async (req, res) => {
 			const salt = await bcrypt.genSalt(10);
 			password = await bcrypt.hash(password, salt);
 			if (!admin) {
-				admin = new Admin({	username, password	});
+				admin = new Admin({	name, username, password	});
 			}
 			await admin.save();
 			const token = admin.generateAuthToken();
