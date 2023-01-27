@@ -1,9 +1,15 @@
-const { Roletypes } = require('../constants');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs');
+const { Roletypes } = require('../constants');
 mongoose.promise = Promise;
 
 const adminSchema = mongoose.Schema({
-	adminId: {
+	name: {
+		type: String,
+		required: true
+	},
+	username: {
 		type: String,
 		required: true
 	},
@@ -21,9 +27,9 @@ const matchPassword = async function (password) {
 const generateAuthToken = function (timeToLive = 24 * 60 * 60 * 1000) {
 	const payload = {
 		user: {
-			id: this._id,
-			email: this.email,
-			role: Roletypes.USER
+			_id: this._id,
+			username: this.username,
+			role: Roletypes.ADMIN
 		}
 	};
 	const token = jwt.sign(payload, process.env.JWT_SECRET, {	expiresIn: timeToLive });

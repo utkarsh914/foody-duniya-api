@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	email: {
+	username: {
 		type: String,
 		unique: true,
 		required: true,
@@ -37,8 +37,8 @@ const matchPassword = async function (password) {
 const generateAuthToken = function (timeToLive = 24 * 60 * 60 * 1000) {
 	const payload = {
 		user: {
-			id: this._id,
-			email: this.email,
+			_id: this._id,
+			username: this.username,
 			role: Roletypes.USER
 		}
 	};

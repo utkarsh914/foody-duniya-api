@@ -11,13 +11,7 @@ const bodyparser = require('body-parser');
 var app = express();
 // start mongodb server
 InitiateMongoServer();
-// app.use(cors());
-app.use(cors({
-	allowedHeaders: ['sessionId', 'Content-Type'],
-	exposedHeaders: ['sessionId'],
-	credentials: true,
-	origin: ['http://localhost:8080', 'https://foody-duniya.herokuapp.com'] // here goes Frontend IP
-}))
+app.use(cors());
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: false }));
 // middleware to add username in session and for flash messages
@@ -28,6 +22,7 @@ app.use((req, res, next) => {
 // use routes
 app.use('/admin', require('./routes/admin'));
 app.use('/user', require('./routes/user'));
+app.use('/dish', require('./routes/dish'))
 app.listen(port, () => {
 	console.log(`Server up on port ${port}`);
 });

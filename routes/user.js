@@ -7,12 +7,13 @@ const bcrypt = require('bcryptjs');
 const { userAuth } = require('../middleware/auth');
 // models
 const User = require('../models/User');
+const Dish = require('../models/Dish');
 
 
 router.post(
 	'/signup',
 	[
-		check('email', 'Please enter a valid email').isEmail(),
+		check('username', 'Please enter a valid username').isString(),
 		check('password', 'Please enter a valid password').isLength({	min: 6 })
 	],
 	async (req, res) => {
@@ -24,8 +25,8 @@ router.post(
 			});
 		};
 		try {
-			let { name, email, password } = req.body;
-			let user = await User.findOne({ email });
+			let { name, username, password } = req.body;
+			let user = await User.findOne({ username });
 			if (user) {
 				console.log('User Already Exists');
 				return res.status(400).json('User Already Exists');
@@ -33,7 +34,7 @@ router.post(
 			const salt = await bcrypt.genSalt(10);
 			password = await bcrypt.hash(password, salt);
 			if (!user) {
-				user = new User({	name, email, password	});
+				user = new User({	name, username, password	});
 			}
 			await user.save();
 			const token = user.generateAuthToken();
@@ -47,10 +48,13 @@ router.post(
 );
 
 
+/**
+ * @returns an object containing authToken and user
+ */
 router.post('/login', async (req, res) => {
 		try {
-			const { email, password } = req.body;
-			const user = await User.findOne({ email });
+			const { username, password } = req.body;
+			const user = await User.findOne({ username });
 			if (!user) {
 				console.log('User Not Exist');
 				return res.status(400).json('User Not Exist');
@@ -61,7 +65,8 @@ router.post('/login', async (req, res) => {
 				return res.status(400).json('Incorrect Password!');
 			}
 			const token = user.generateAuthToken();
-			delete user.password;
+			delete user['password'];
+			console.log(user);
 			res.status(200).json({ token, user });
 		}
 		catch (err) {
@@ -71,15 +76,18 @@ router.post('/login', async (req, res) => {
 	}
 )
 
-
-router.get('/me', userAuth, async (req, res) => {
+// used to search for dishes by the user
+router.get('/search-dishes', userAuth, async (req, res) => {
 	try {
-		// request.user is getting fetched from Middleware after token authentication
-		const user = await User.findById(req.user.id);
-		res.json(user);
-	} catch (e) {
-		console.log('Error in Fetching user');
-		res.send('Error in Fetching user');
+		const { name } = req.query;
+		// return empty array if query is blank
+		if (!name) return res.send({ dishes: [] });
+		const dishes = await Dish.find({ name: new RegExp(name, 'i') });
+		return res.send({ dishes });
+	}
+	catch (err) {
+		console.error(err);
+		return res.status(500).send('Some server side error occured');
 	}
 });
 
