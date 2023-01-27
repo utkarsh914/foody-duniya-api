@@ -66,7 +66,6 @@ router.post('/login', async (req, res) => {
 			}
 			const token = user.generateAuthToken();
 			delete user['password'];
-			console.log(user);
 			res.status(200).json({ token, user });
 		}
 		catch (err) {
@@ -80,8 +79,6 @@ router.post('/login', async (req, res) => {
 router.get('/search-dishes', userAuth, async (req, res) => {
 	try {
 		const { name } = req.query;
-		// return empty array if query is blank
-		if (!name) return res.send({ dishes: [] });
 		const dishes = await Dish.find({ name: new RegExp(name, 'i') });
 		return res.send({ dishes });
 	}
