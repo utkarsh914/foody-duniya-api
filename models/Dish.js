@@ -7,10 +7,9 @@ const dishSchema = mongoose.Schema({
 		type: String,
 		required: true
 	},
-	// picture_uri: {
-	// 	type: String,
-	// 	required: true
-	// },
+	picture: {
+		type: String
+	},
 	adminId: {
 		type: ObjectId,
 		ref: 'admins',

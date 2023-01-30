@@ -33,9 +33,9 @@ router.get('/search-dishes', dishAuth, async (req, res) => {
 // TODO: add upload picture as well
 router.post('/', adminAuth, async (req, res) => {
 	try {
-		let { name, description, price } = req.body;
+		let { name, description, price, picture } = req.body;
 		price = parseInt(price);
-		await new Dish({ name, description, price, adminId: req.user._id }).save();
+		await new Dish({ name, description, price, picture, adminId: req.user._id }).save();
 		return res.send('Dish created successfully');
 	}
 	catch (err) {
